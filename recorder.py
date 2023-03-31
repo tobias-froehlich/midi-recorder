@@ -37,6 +37,15 @@ def userInputTask(flag, globals):
         elif userInput == "record":
             flag[0] = 2
             globals["start"] = time.time_ns()
+            try:
+                with open(filename, "r") as f:
+                    for line in f:
+                        pass
+                last_time = int(line.strip().split(",")[0])
+                globals["start"] = time.time_ns() - last_time - 10 * 1e9
+                print("File exists. Append 10 seconds after end.")
+            except FileNotFoundError:
+                print("New file.")
             globals["file"] = open(filename, "a")
         elif userInput == "play":
             try:
@@ -77,6 +86,7 @@ def listeningTask(flag, globals):
                    globals["file"].close()
                    globals["play_message"]
                    flag[0] = 1
+                   print("Play end.")
            else:
                if time.time_ns() >= t:
                    print(globals["play_message"])
