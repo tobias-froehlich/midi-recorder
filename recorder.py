@@ -24,6 +24,15 @@ globals = {
 }
 
 
+def stopAllNotes():
+    for channel in range(16):
+        for note in range(128):
+            midiOutputPort.send(mido.Message(
+                "note_off",
+                channel=channel,
+                note=note
+            ))
+
 def userInputTask(flag, globals):
     filename = "/tmp/recording_" + datetime.datetime.now().isoformat() + ".txt"
     while flag[0]:
@@ -62,6 +71,7 @@ def userInputTask(flag, globals):
         elif userInput == "stop":
             if globals["file"]:
                 globals["file"].close()
+            stopAllNotes()
             flag[0] = 1
         
 
