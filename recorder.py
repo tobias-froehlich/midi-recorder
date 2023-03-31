@@ -18,7 +18,7 @@ midiOutputPort = mido.open_output(
 flag = [1,]
 globals = {
     "file": None,
-    "record_play_difference": 0,
+    "start": 0,
     "play_message": None,
 }
 
@@ -36,16 +36,12 @@ def userInputTask(flag, globals):
             print("file =", filename)
         elif userInput == "record":
             flag[0] = 2
+            globals["start"] = time.time_ns()
             globals["file"] = open(filename, "a")
         elif userInput == "play":
             try:
-                with open(filename, "r") as f:
-                    words = f.readline().strip().split(",")
-                    record_start = int(words[0])
-                    play_start = time.time_ns()
-                    globals["record_play_difference"] = play_start - record_start
-
                 globals["file"] = open(filename, "r")
+                globals["start"] = time.time_ns()
                 flag[0] = 3
             except FileNotFoundError:
                 print("File not found:", filename)
@@ -60,7 +56,7 @@ def listeningTask(flag, globals):
     while flag[0]:
         if flag[0] == 2:
             message = midiInputPort.poll()
-            t = time.time_ns()
+            t = time.time_ns() - globals["start"]
             if message:
                event = "%i,%s,%i,%i,%i\n"%(t, message.type, message.channel, message.note, message.velocity)
                print(event)
@@ -76,7 +72,7 @@ def listeningTask(flag, globals):
                        note=int(event[3]),
                        velocity=int(event[4])
                    )
-                   t = int(event[0]) + globals["record_play_difference"]
+                   t = int(event[0]) + globals["start"]
                else:
                    globals["file"].close()
                    globals["play_message"]
