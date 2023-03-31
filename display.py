@@ -57,7 +57,8 @@ for i in range(128):
 
 for note in notes:
     n = note["note"]
-    plt.fill_between([note["start_time"], note["end_time"]], [n-0.5, n-0.5], [n+0.5, n+0.5], color=channelColors[note["channel"]])
+    #plt.fill_between([note["start_time"], note["end_time"]], [n-0.5, n-0.5], [n+0.5, n+0.5], color=channelColors[note["channel"]])
+    plt.plot([note["start_time"], note["end_time"]], [n, n], color=channelColors[note["channel"]], linewidth=5)
     
 
 plt.show()

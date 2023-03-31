@@ -2,19 +2,34 @@ import sys
 
 def readEventsFromFile(filename):
     events = []
-    with open(filename, "r") as f:
-        for line in f:
-            words = line.strip().split(",")
-            assert len(words) == 5
-            events.append({
-                "time": int(words[0]),
-                "type": words[1],
-                "channel": int(words[2]),
-                "note": int(words[3]),
-                "velocity": int(words[4]),
-            })
+    try:
+        with open(filename, "r") as f:
+            for line in f:
+                words = line.strip().split(",")
+                assert len(words) == 5
+                events.append({
+                    "time": int(words[0]),
+                    "type": words[1],
+                    "channel": int(words[2]),
+                    "note": int(words[3]),
+                    "velocity": int(words[4]),
+                })
+    except FileNotFoundError:
+        print("File not found:", filename)
+        sys.exit()
     return events
 
+def writeEventsToFile(events, filename):
+    with open(filename, "w") as f:
+        for event in events:
+            f.write("%i,%s,%i,%i,%i\n"%(
+                int(event["time"]*1e9),
+                event["type"],
+                event["channel"],
+                event["note"],
+                event["velocity"],
+            ))
+    
 
 def transformEventsToNotes(events):
     notes = []
@@ -46,4 +61,22 @@ def transformEventsToNotes(events):
     return notes
             
 
-
+def transformNotesToEvents(notes):
+    events = []
+    for note in notes:
+        events.append({
+            "time": note["start_time"],
+            "type": "note_on",
+            "channel": note["channel"],
+            "note": note["note"],
+            "velocity": note["velocity"],
+        })
+        events.append({
+            "time": note["end_time"],
+            "type": "note_off",
+            "channel": note["channel"],
+            "note": note["note"],
+            "velocity": 0,
+        })
+    events.sort(key=lambda x: x["time"])
+    return events
