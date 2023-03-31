@@ -2,6 +2,7 @@ import mido
 import datetime
 import time
 import threading
+import os
 
 midiInputPort = mido.open_input(
     name="recorder",
@@ -32,7 +33,11 @@ def userInputTask(flag, globals):
                 globals["file"].close()
             flag[0] = 0
         elif userInput.startswith("file="):
-            filename = userInput.split("=")[1]
+            newFilename = os.path.expanduser(userInput.split("=")[1])
+            if os.path.exists(os.path.split(newFilename)[0]):
+                filename = newFilename
+            else:
+                print("Directory does not exist.")
             print("file =", filename)
         elif userInput == "record":
             flag[0] = 2
