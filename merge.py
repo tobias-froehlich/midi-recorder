@@ -32,7 +32,7 @@ for line in mergelines:
     words = line.strip().split()
     if words[0] == "out":
         if outputfile == None:
-            outputfile = os.path.expanduser(words[1])
+            outputfile = os.path.join(os.path.split(mergefilename)[0], words[1])
         else:
             print("Specify only one output file in the merge file.")
             sys.exit()
@@ -57,7 +57,7 @@ for line in mergelines:
         starttime = float(words[2])
         print(starttime)
         endttime = float(words[3])
-        events = readEventsFromFile(filename)
+        events = readEventsFromFile(os.path.join(os.path.split(mergefilename)[0], filename))
         notes = transformEventsToNotes(events)
         newOffset = offset
         for note in notes:
